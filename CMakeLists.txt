@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.12)
+
+project(glfw-example)
+set(targetExec "glfw-example")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+find_package(OpenGL REQUIRED)
+find_package(glfw3 3.3 REQUIRED)
+add_subdirectory(ext/glad)
+include_directories(ext/glad/include)
+
+add_executable(${targetExec} main.cpp)
+
+target_link_libraries(${targetExec} glfw glad)
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(${targetExec} OpenGL::OpenGL)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    target_link_libraries(${targetExec} OpenGL32)
+endif()
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_libraries(${targetExec} dl)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+endif()
+
+include(CPackConfig.cmake)
