@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)//註冊回調函數動態調整窗口大小
@@ -45,6 +44,34 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+
+
+    float vertices[] = {
+    -0.5f, -0.5f,  0.0f,
+     0.5f, -0.5f,  0.0f,
+     0.0f,  0.5f,  0.0f
+    };//三個頂點
+
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);//生成VBO對象
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);//綁定緩衝到GL_ARRAY_BUFFER
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//將定義的頂點複製進緩衝內
+    //GL_STATIC_DRAW ：數據幾乎不改變。
+    // GL_DYNAMIC_DRAW：數據會被改變。
+     //GL_STREAM_DRAW ：數據每次都被改變。
+
+    const char* vertexShaderSource = "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "}\0";//頂點著色器原碼
+    unsigned int vertexSharder;
+    vertexSharder = glCreateShader(GL_VERTEX_SHADER);
+
+    glShaderSource(vertexSharder, 1, &vertexShaderSource, NULL);//將著色器原碼放進著色器對象內
+    glCompileShader(vertexSharder);//編譯頂點著色器
 
     glViewport(150, 100, 800, 600);//窗口位置高,窗口位置寬,窗口渲染高,窗口渲染寬
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//註冊調整窗口函數
