@@ -124,7 +124,7 @@ int main()
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
-    glViewport(100, 100, 800, 600);//窗口位置高,窗口位置寬,窗口渲染高,窗口渲染寬
+    glViewport(0, 0, 800, 600);//窗口位置高,窗口位置寬,窗口渲染高,窗口渲染寬
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//註冊調整窗口函數
     glfwSetKeyCallback(window, key_callback);//註冊手柄控制函數
 
