@@ -18,6 +18,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)//按下esc關閉
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
 int main()
 {
     glfwInit();//初始化
@@ -45,6 +51,8 @@ int main()
     glfwSetKeyCallback(window, key_callback);//註冊手柄控制函數
 
     while(!glfwWindowShouldClose(window)) {
+        processInput(window);
+
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwSwapBuffers(window);//交換顏色緩衝
