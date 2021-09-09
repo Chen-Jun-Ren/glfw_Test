@@ -68,11 +68,19 @@ int main()
 
     unsigned int VBO;
     glGenBuffers(1, &VBO);//生成VBO對象
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);//生成VAO對象
+    glBindVertexArray(VAO);
+    //2.把頂點數組複製到緩衝中供OPenGL使用
     glBindBuffer(GL_ARRAY_BUFFER, VBO);//綁定緩衝到GL_ARRAY_BUFFER
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//將定義的頂點複製進緩衝內
     //GL_STATIC_DRAW ：數據幾乎不改變。
     // GL_DYNAMIC_DRAW：數據會被改變。
      //GL_STREAM_DRAW ：數據每次都被改變。
+
+    //3.設置頂點屬性指標
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     //創建和編譯著色器
     //------------------------------------
@@ -104,7 +112,7 @@ int main()
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
-    //Shader Program著色器程序
+    //Shader Program著色器程序(link shaders)
     unsigned int shaderProgram;
     shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
@@ -125,9 +133,18 @@ int main()
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //繪製三角形
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         glfwSwapBuffers(window);//交換顏色緩衝
         glfwPollEvents();//檢查觸發事件 比如鍵盤滑鼠
     }
+
+    glDeleteShader(vertexShader);//刪除頂點著色器
+    glDeleteShader(fragmentShader);//刪除片段著色器
 
     glfwTerminate();//釋放and刪除分配資源
     return 0;
