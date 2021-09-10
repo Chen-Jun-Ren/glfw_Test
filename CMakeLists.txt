@@ -9,12 +9,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
+find_package(imgui REQUIRED)
 add_subdirectory(ext/glad)
 include_directories(ext/glad/include)
 
 add_executable(${targetExec} main.cpp)
 
 target_link_libraries(${targetExec} glfw glad)
+target_link_libraries(${targetExec} imgui::imgui)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${targetExec} OpenGL::OpenGL)

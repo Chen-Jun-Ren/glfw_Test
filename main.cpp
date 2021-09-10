@@ -2,6 +2,12 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "imgui.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.cpp"
+#include "imgui/backends/imgui_impl_glfw.cpp"
+
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
@@ -59,6 +65,14 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, // left  
@@ -128,20 +142,38 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//註冊調整窗口函數
     glfwSetKeyCallback(window, key_callback);//註冊手柄控制函數
 
+
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清空深度顏色緩衝和深度緩衝
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         //繪製三角形
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        ImGui::Begin("My name");
+        ImGui::Text("Hello World");
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
         glfwSwapBuffers(window);//交換顏色緩衝
         glfwPollEvents();//檢查觸發事件 比如鍵盤滑鼠
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
 
     glDeleteShader(vertexShader);//刪除頂點著色器
     glDeleteShader(fragmentShader);//刪除片段著色器
