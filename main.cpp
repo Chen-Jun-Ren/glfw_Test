@@ -11,16 +11,18 @@
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
+"uniform float size;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"   gl_Position = vec4(size * aPos.x, size * aPos.y, size * aPos.z, 1.0);\n"
 "}\0";//頂點著色器原碼
 
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
+"uniform vec4 color;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = color;\n"
 "}\n";//片段著色器原始碼
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)//註冊回調函數動態調整窗口大小
@@ -73,6 +75,10 @@ int main()
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
+
+    bool drawTriangle = true;
+    float size = 1.0f;
+    float color[4] = { 0.8f, 0.2f, 0.03f, 1.0f };
 
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, // left  
@@ -142,6 +148,9 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//註冊調整窗口函數
     glfwSetKeyCallback(window, key_callback);//註冊手柄控制函數
 
+    glUseProgram(shaderProgram);
+    glUniform1f(glGetUniformLocation(shaderProgram, "size"), size);
+    glUniform4f(glGetUniformLocation(shaderProgram, "color"), color[0], color[1], color[2], color[3]);
 
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -155,11 +164,17 @@ int main()
 
         //繪製三角形
         glUseProgram(shaderProgram);
+        glUniform1f(glGetUniformLocation(shaderProgram, "size"), size);
+        glUniform4f(glGetUniformLocation(shaderProgram, "color"), color[0], color[1], color[2], color[3]);
+        if (drawTriangle)
+            glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         ImGui::Begin("My name");
         ImGui::Text("Hello World");
+        ImGui::Checkbox("Draw Triangle", &drawTriangle);
+        ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
+        ImGui::ColorEdit4("Color", color);
         ImGui::End();
 
         ImGui::Render();
