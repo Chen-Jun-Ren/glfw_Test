@@ -2,19 +2,30 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "ext/glm/glm.hpp"
+#include "ext/glm/gtc/matrix_transform.hpp"
+#include "ext/glm/gtc/type_ptr.hpp"
+
 #include "imgui.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.cpp"
 #include "imgui/backends/imgui_impl_glfw.cpp"
 
+float vertices[] = {
+        -0.5f, -0.5f, 0.0f, // left  
+         0.5f, -0.5f, 0.0f, // right 
+         0.0f,  0.5f, 0.0f  // top   
+};
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "uniform float size;\n"
+"uniform float cos;\n"
+"uniform float sin;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(size * aPos.x, size * aPos.y, size * aPos.z, 1.0);\n"
+"   gl_Position = vec4(size * (aPos.x * cos + aPos.y * sin) , size * (aPos.x * -sin + aPos.y * cos), size * aPos.z, 1.0);\n"
 "}\0";//頂點著色器原碼
 
 const char* fragmentShaderSource = "#version 330 core\n"
@@ -68,6 +79,7 @@ int main()
         return -1;
     }
 
+    //----ImGui init ----
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -76,27 +88,25 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    //----ImGUi contrule block----
     bool drawTriangle = true;
     float size = 1.0f;
     float color[4] = { 0.8f, 0.2f, 0.03f, 1.0f };
+    float rotate = 0.0f;
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
-    };
-
+    //生成Buffer Object
     unsigned int VBO;
     glGenBuffers(1, &VBO);//生成VBO對象
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);//生成VAO對象
     glBindVertexArray(VAO);
-    //2.把頂點數組複製到緩衝中供OPenGL使用
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);//綁定緩衝到GL_ARRAY_BUFFER
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//將定義的頂點複製進緩衝內
-    //GL_STATIC_DRAW ：數據幾乎不改變。
+
+    // 2.把頂點數組複製到緩衝中供OPenGL使用
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);// 綁定緩衝到GL_ARRAY_BUFFER
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);//將定義的頂點複製進緩衝內
+    // GL_STATIC_DRAW ：數據幾乎不改變。
     // GL_DYNAMIC_DRAW：數據會被改變。
-     //GL_STREAM_DRAW ：數據每次都被改變。
+    // GL_STREAM_DRAW ：數據每次都被改變。
 
     //3.設置頂點屬性指標
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -148,9 +158,11 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//註冊調整窗口函數
     glfwSetKeyCallback(window, key_callback);//註冊手柄控制函數
 
-    glUseProgram(shaderProgram);
+    /*glUseProgram(shaderProgram);
     glUniform1f(glGetUniformLocation(shaderProgram, "size"), size);
     glUniform4f(glGetUniformLocation(shaderProgram, "color"), color[0], color[1], color[2], color[3]);
+    glUniform1f(glGetUniformLocation(shaderProgram, "cos"), cos(rotate));
+    glUniform1f(glGetUniformLocation(shaderProgram, "sin"), sin(rotate));*/
 
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -166,15 +178,18 @@ int main()
         glUseProgram(shaderProgram);
         glUniform1f(glGetUniformLocation(shaderProgram, "size"), size);
         glUniform4f(glGetUniformLocation(shaderProgram, "color"), color[0], color[1], color[2], color[3]);
+        glUniform1f(glGetUniformLocation(shaderProgram, "cos"), cos(rotate));
+        glUniform1f(glGetUniformLocation(shaderProgram, "sin"), sin(rotate));
         if (drawTriangle)
             glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(VAO);
 
+        //繪製imgui介面
         ImGui::Begin("My name");
         ImGui::Text("Hello World");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Checkbox("Draw Triangle", &drawTriangle);
         ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
+        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 10.0f);
         ImGui::ColorEdit4("Color", color);
         ImGui::End();
 
