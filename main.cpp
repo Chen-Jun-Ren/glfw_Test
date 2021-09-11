@@ -18,12 +18,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 // settings
 const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_HEIGHT = 800;
 
 float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
+         0.5f,  0.5f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f  // top left    
+};
+
+unsigned int indices[] = {  
+    0, 1, 3, 
+    1, 2, 3  
 };
 
 void processInput(GLFWwindow* window)
@@ -68,8 +74,6 @@ int main()
     float size = 1.0f;
     float color[4] = { 0.8f, 0.2f, 0.03f, 1.0f };
     float rotate = 0.0f;
-    glm::mat4 trans;
-    trans = glm::rotate(trans, glm::radians(rotate), glm::vec3(0.0, 0.0, 1.0));
 
     Shader ourShader("D:/GitHub/glfw_Test/Shader/3.3.shader.vs", "D:/GitHub/glfw_Test/Shader/3.3.shader.fs");
 
@@ -79,6 +83,9 @@ int main()
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);//生成VAO對象
     glBindVertexArray(VAO);
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);//生成EBO對象
+
 
     // 2.把頂點數組複製到緩衝中供OPenGL使用
     glBindBuffer(GL_ARRAY_BUFFER, VBO);// 綁定緩衝到GL_ARRAY_BUFFER
@@ -86,6 +93,8 @@ int main()
     // GL_STATIC_DRAW ：數據幾乎不改變。
     // GL_DYNAMIC_DRAW：數據會被改變。
     // GL_STREAM_DRAW ：數據每次都被改變。
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //3.設置頂點屬性指標
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -105,6 +114,7 @@ int main()
         ImGui::NewFrame();
 
         // create transformations
+        float rad = (3.14159265358 / 180) * rotate;
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         transform = glm::rotate(transform, rotate, glm::vec3(0.0f, 0.0f, 1.0f));
 
@@ -114,7 +124,10 @@ int main()
         ourShader.setVec4("color", color[0], color[1], color[2], color[3]);
         ourShader.setMat4("transform", transform);
         if (drawTriangle)
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+        {
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        }
 
         //繪製imgui介面
         ImGui::Begin("My name");
@@ -137,10 +150,6 @@ int main()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
-
-    //glDeleteShader(vertexShader);//刪除頂點著色器
-    //glDeleteShader(fragmentShader);//刪除片段著色器
 
     glfwTerminate();//釋放and刪除分配資源
     return 0;
