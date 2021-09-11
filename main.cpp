@@ -7,10 +7,10 @@
 #include "ext/glm/gtc/type_ptr.hpp"
 
 #include "imgui.h"
-#include "imgui/backends/imgui_impl_opengl3.h"
-#include "imgui/backends/imgui_impl_glfw.h"
-#include "imgui/backends/imgui_impl_opengl3.cpp"
-#include "imgui/backends/imgui_impl_glfw.cpp"
+#include "ext/imgui/backends/imgui_impl_opengl3.h"
+#include "ext/imgui/backends/imgui_impl_glfw.h"
+#include "ext/imgui/backends/imgui_impl_opengl3.cpp"
+#include "ext/imgui/backends/imgui_impl_glfw.cpp"
 
 float vertices[] = {
         -0.5f, -0.5f, 0.0f, // left  
@@ -21,12 +21,14 @@ float vertices[] = {
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "uniform float size;\n"
-"uniform float cos;\n"
-"uniform float sin;\n"
+"uniform mat4 transform;\n"
+//"uniform float cos;\n"
+//"uniform float sin;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(size * (aPos.x * cos + aPos.y * sin) , size * (aPos.x * -sin + aPos.y * cos), size * aPos.z, 1.0);\n"
-"}\0";//頂點著色器原碼
+"   gl_Position = vec4( size * aPos.x, size * aPos.y, size * aPos.z, 1.0f);\n"
+//"   gl_Position = vec4(size * (aPos.x * cos + aPos.y * sin) , size * (aPos.x * -sin + aPos.y * cos), size * aPos.z, 1.0);\n"
+"}\n";//頂點著色器原碼
 
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
@@ -36,20 +38,8 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "   FragColor = color;\n"
 "}\n";//片段著色器原始碼
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)//註冊回調函數動態調整窗口大小
-{
-    glViewport(0, 0, width, height);
-}
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-    {
-        if (mods & GLFW_MOD_CONTROL) {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);//關閉窗口
-        }
-    }
-}
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);//註冊回調函數動態調整窗口大小
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);//關閉窗口
 
 void processInput(GLFWwindow* window)
 {
@@ -93,6 +83,8 @@ int main()
     float size = 1.0f;
     float color[4] = { 0.8f, 0.2f, 0.03f, 1.0f };
     float rotate = 0.0f;
+    glm::mat4 trans;
+    trans = glm::rotate(trans, glm::radians(rotate), glm::vec3(0.0, 0.0, 1.0));
 
     //生成Buffer Object
     unsigned int VBO;
@@ -180,6 +172,7 @@ int main()
         glUniform4f(glGetUniformLocation(shaderProgram, "color"), color[0], color[1], color[2], color[3]);
         glUniform1f(glGetUniformLocation(shaderProgram, "cos"), cos(rotate));
         glUniform1f(glGetUniformLocation(shaderProgram, "sin"), sin(rotate));
+        glUniformMatrix3x4fv(glGetUniformLocation(shaderProgram, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
         if (drawTriangle)
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -211,4 +204,19 @@ int main()
 
     glfwTerminate();//釋放and刪除分配資源
     return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)//註冊回調函數動態調整窗口大小
+{
+    glViewport(0, 0, width, height);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+    {
+        if (mods & GLFW_MOD_CONTROL) {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);//關閉窗口
+        }
+    }
 }
