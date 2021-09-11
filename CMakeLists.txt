@@ -16,7 +16,7 @@ find_package(imgui REQUIRED)
 add_subdirectory(ext/glad)
 include_directories(ext/glad/include)
 
-add_executable(${targetExec} main.cpp)
+add_executable(${targetExec} main.cpp "Shader/shader.h")
 
 target_link_libraries(${targetExec} glfw glad)
 target_link_libraries(${targetExec} imgui::imgui)
