@@ -75,7 +75,7 @@ int main()
     float color[4] = { 0.8f, 0.2f, 0.03f, 1.0f };
     float rotate = 0.0f;
 
-    Shader ourShader("D:/GitHub/glfw_Test/Shader/3.3.shader.vs", "D:/GitHub/glfw_Test/Shader/3.3.shader.fs");
+    Shader ourShader("3.3.shader.vs", "3.3.shader.fs");
 
     //¥Í¦¨Buffer Object
     unsigned int VBO;
