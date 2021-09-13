@@ -116,7 +116,7 @@ int main()
         // create transformations
         float rad = (3.14159265358 / 180) * rotate;
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        transform = glm::rotate(transform, rotate, glm::vec3(0.0f, 0.0f, 1.0f));
+        transform = glm::rotate(transform, rad, glm::vec3(0.0f, 0.0f, 1.0f));
 
         //Ã¸»s¤T¨¤§Î
         ourShader.use();
@@ -135,7 +135,7 @@ int main()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Checkbox("Draw Triangle", &drawTriangle);
         ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
-        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 10.0f);
+        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 360.0f);
         ImGui::ColorEdit4("Color", color);
         ImGui::End();
 
