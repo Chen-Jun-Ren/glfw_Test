@@ -21,15 +21,15 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
 float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f  // top left    
+         0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,      // top right
+         0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,     // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // bottom left
+        -0.5f,  0.5f, 0.0f    ,1.0f, 0.0f, 1.0f  // top left    
 };
 
 unsigned int indices[] = {  
-    0, 1, 3, 
-    1, 2, 3  
+    0, 2, 6, 
+    2, 4, 6  
 };
 
 void processInput(GLFWwindow* window)
@@ -99,6 +99,10 @@ int main()
     //3.設置頂點屬性指標
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    //顏色
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//註冊調整窗口函數
     glfwSetKeyCallback(window, key_callback);//註冊手柄控制函數
