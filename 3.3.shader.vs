@@ -10,5 +10,5 @@ void main()
 {
    gl_Position = transform * vec4( size * aPos.x, size * aPos.y, size * aPos.z, 1.0f);
    ourColor = aColor;
-}//頂點著色器原碼
+}//嚙踝蕭嚙瘢嚙諛色器嚙踝蕭X
 
