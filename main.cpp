@@ -3,15 +3,13 @@
 #include <iostream>
 
 #include "Shader/shader.h"
-#include "ext/glm/glm.hpp"
-#include "ext/glm/gtc/matrix_transform.hpp"
-#include "ext/glm/gtc/type_ptr.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "imgui.h"
-#include "ext/imgui/backends/imgui_impl_opengl3.h"
-#include "ext/imgui/backends/imgui_impl_glfw.h"
-#include "ext/imgui/backends/imgui_impl_opengl3.cpp"
-#include "ext/imgui/backends/imgui_impl_glfw.cpp"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_glfw.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);//註冊回調函數動態調整窗口大小
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);//關閉窗口
