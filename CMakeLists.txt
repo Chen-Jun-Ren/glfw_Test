@@ -13,6 +13,7 @@ SET(CMAKE_BUILD_TYPE "Release")
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(imgui REQUIRED)
+find_package(glm CONFIG REQUIRED)
 add_subdirectory(ext/glad)
 include_directories(ext/glad/include)
 
@@ -20,6 +21,7 @@ add_executable(${targetExec} main.cpp "Shader/shader.h")
 
 target_link_libraries(${targetExec} glfw glad)
 target_link_libraries(${targetExec} imgui::imgui)
+target_link_libraries(${targetExec} glm::glm)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${targetExec} OpenGL::OpenGL)
