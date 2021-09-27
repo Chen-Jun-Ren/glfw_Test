@@ -3,15 +3,13 @@
 #include <iostream>
 
 #include "Shader/shader.h"
-#include "ext/glm/glm.hpp"
-#include "ext/glm/gtc/matrix_transform.hpp"
-#include "ext/glm/gtc/type_ptr.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "imgui.h"
-#include "ext/imgui/backends/imgui_impl_opengl3.h"
-#include "ext/imgui/backends/imgui_impl_glfw.h"
-#include "ext/imgui/backends/imgui_impl_opengl3.cpp"
-#include "ext/imgui/backends/imgui_impl_glfw.cpp"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_glfw.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);//註冊回調函數動態調整窗口大小
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);//關閉窗口
@@ -139,7 +137,7 @@ int main()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Checkbox("Draw Triangle", &drawTriangle);
         ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
-        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 360.0f);
+        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 270.0f);
         ImGui::ColorEdit4("Color", color);
         ImGui::End();
 
