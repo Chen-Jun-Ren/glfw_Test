@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <filesystem>
 
 #include "Shader/shader.h"
 #include "glm/glm.hpp"
@@ -11,6 +12,9 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
 
+#include "ext/stb_image/stb_image.h"
+#include "ext/filesystem.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);//註冊回調函數動態調整窗口大小
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);//關閉窗口
 
@@ -19,15 +23,16 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
 float vertices[] = {
-         0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,      // top right
-         0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,     // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // bottom left
-        -0.5f,  0.5f, 0.0f    ,1.0f, 0.0f, 1.0f  // top left    
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 };
 
-unsigned int indices[] = {  
-    0, 2, 6, 
-    2, 4, 6  
+unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
 };
 
 void processInput(GLFWwindow* window)
@@ -73,7 +78,8 @@ int main()
     float color[4] = { 0.8f, 0.2f, 0.03f, 1.0f };
     float rotate = 0.0f;
 
-    Shader ourShader("3.3.shader.vs", "3.3.shader.fs");
+    //Shader ourShader("3.3.shader.vs", "3.3.shader.fs");
+    Shader ourShader("4.1.texture.vs", "4.1.texture.fs");
 
     //生成Buffer Object
     unsigned int VBO;
@@ -95,21 +101,53 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //3.設置頂點屬性指標
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     //顏色
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//註冊調整窗口函數
     glfwSetKeyCallback(window, key_callback);//註冊手柄控制函數
+
+    // load and create a texture 
+    // -------------------------
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+    unsigned char* data = stbi_load(FileSystem::getPath("image/container.jpg").c_str(), &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
 
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清空深度顏色緩衝和深度緩衝
+        // bind Texture
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

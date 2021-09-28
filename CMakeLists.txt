@@ -17,7 +17,7 @@ find_package(glm CONFIG REQUIRED)
 add_subdirectory(ext/glad)
 include_directories(ext/glad/include)
 
-add_executable(${targetExec} main.cpp "Shader/shader.h")
+add_executable(${targetExec} main.cpp "Shader/shader.h" "ext/stb_image/stb_image.cpp" "ext/root_directory.h")
 
 target_link_libraries(${targetExec} glfw glad)
 target_link_libraries(${targetExec} imgui::imgui)
