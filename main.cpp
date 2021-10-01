@@ -41,6 +41,9 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+// stores how much we're seeing of either texture
+float mixValue = 0.7;
+
 int main()
 {
     glfwInit();//ªì©l¤Æ
@@ -128,6 +131,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
     unsigned char* data = stbi_load(FileSystem::getPath("image/container.jpg").c_str(), &width, &height, &nrChannels, 0);
 
@@ -158,7 +162,7 @@ int main()
     data = stbi_load(FileSystem::getPath("image/awesomeface.png").c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -176,6 +180,10 @@ int main()
     ourShader.setInt("texture2", 1);
 
     while(!glfwWindowShouldClose(window)) {
+        
+        mixValue = (sinf(glfwGetTime()) + 1) * 0.5;
+        //size = (sinf(glfwGetTime()) + 2) * 0.5;
+        
         processInput(window);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -185,6 +193,9 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
+
+        // set the texture mix value in the shader
+        ourShader.setFloat("mixValue", mixValue);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -212,7 +223,8 @@ int main()
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Checkbox("Draw Triangle", &drawTriangle);
         ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
-        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 270.0f);
+        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 360.0f);
+        ImGui::SliderFloat("mixTexture", &mixValue, 0.0f, 1.0);
         ImGui::ColorEdit4("Color", color);
         ImGui::End();
 
