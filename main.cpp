@@ -82,7 +82,7 @@ int main()
     float rotate = 0.0f;
 
     //Shader ourShader("3.3.shader.vs", "3.3.shader.fs");
-    Shader ourShader("4.1.texture.vs", "4.1.texture.fs");
+    Shader ourShader("Shader/4.1.texture.vs", "Shader/4.1.texture.fs");
 
     //¥Í¦¨Buffer Object
     unsigned int VBO;
@@ -181,9 +181,6 @@ int main()
 
     while(!glfwWindowShouldClose(window)) {
         
-        mixValue = (sinf(glfwGetTime()) + 1) * 0.5;
-        //size = (sinf(glfwGetTime()) + 2) * 0.5;
-        
         processInput(window);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -202,7 +199,10 @@ int main()
         ImGui::NewFrame();
 
         // create transformations
-        float rad = (3.14159265358 / 180) * rotate;
+        mixValue = (sinf(glfwGetTime()) + 1) * 0.5;
+        rotate = (sinf(glfwGetTime()) + 1) * 0.5;
+        size = (sinf(glfwGetTime()) + 2) * 0.5;
+        float rad = (3.14159265358 * 360 / 180) * rotate;
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         transform = glm::rotate(transform, rad, glm::vec3(0.0f, 0.0f, 1.0f));
 
@@ -222,8 +222,8 @@ int main()
         ImGui::Text("Hello World");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Checkbox("Draw Triangle", &drawTriangle);
-        ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
-        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 360.0f);
+        ImGui::SliderFloat("Size", &size, 0.5f, 1.5f);
+        ImGui::SliderFloat("Rotate", &rotate, 0.0f, 1.0f);
         ImGui::SliderFloat("mixTexture", &mixValue, 0.0f, 1.0);
         ImGui::ColorEdit4("Color", color);
         ImGui::End();

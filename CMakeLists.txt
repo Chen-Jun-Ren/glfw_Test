@@ -34,4 +34,17 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif()
 
+message(STATUS "Binary Dir: ${CMAKE_BINARY_DIR}")
+
+add_custom_target(TargetSymlinkResources
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        "${CMAKE_SOURCE_DIR}/Shader"
+        "${CMAKE_BINARY_DIR}/Shader"
+    DEPENDS
+        "${CMAKE_SOURCE_DIR}/Shader"
+    VERBATIM
+)
+
+add_dependencies(${targetExec} TargetSymlinkResources)
+
 include(CPackConfig.cmake)
